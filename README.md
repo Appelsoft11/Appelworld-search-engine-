@@ -1,6 +1,7 @@
 # Appel's Experimental Paint-
 
 
+<img width="1764" height="806" alt="image" src="https://github.com/user-attachments/assets/aa685de5-5eea-45cc-91a1-57d32b857b4e" />
 
 
 
