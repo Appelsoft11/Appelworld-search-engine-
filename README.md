@@ -10,6 +10,18 @@
 
 
 
+
+<img width="1761" height="800" alt="image" src="https://github.com/user-attachments/assets/ce8c1e51-c58f-4c54-b4f0-2fdfe3315cb4" />
+
+
+
+
+
+
+
+
+
+
 Unfinished of web paint with embedded scripts.
 
 Instructions:
