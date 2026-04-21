@@ -6,8 +6,11 @@
 
 
 
-This is a my paint script
 
+
+
+
+Unfinished of web paint with embedded scripts.
 
 Instructions:
 1. Opem and copy the scriptresource script
