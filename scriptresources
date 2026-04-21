@@ -4,7 +4,7 @@ Created by: Appelsoft
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JS Paint Pro</title>
+    <title>Appel's Experimental Paint</title>
     <style>
         body { margin: 0; background: #333; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
         #toolbar { background: #999; padding: 10px; display: flex; gap: 15px; align-items: center; color: white; }
@@ -20,7 +20,7 @@ Created by: Appelsoft
         <input type="color" id="colorPicker" value="#000000">
         <input type="range" id="lineWidth" min="1" max="50" value="5">
         <span id="sizeDisplay">5px</span>
-        <button id="clearBtn">Clear Canvas</button>
+        <button id="clearBtn">Erase all</button>
         <button id="eraserBtn">Eraser</button>
     </div>
 
@@ -90,4 +90,3 @@ Created by: Appelsoft
 </script>
 </body>
 </html>
-... print(f"Inverted index loaded from CSV contains {len(loaded_index)} terms")
