@@ -1,168 +1,93 @@
 Created by: Appelsoft
 
-Enter "help" below or click "Help" above for more information.
-import string
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Paint Pro</title>
+    <style>
+        body { margin: 0; background: #333; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        #toolbar { background: #222; padding: 10px; display: flex; gap: 15px; align-items: center; color: white; }
+        canvas { background: white; cursor: crosshair; flex-grow: 1; }
+        input[type="color"] { border: none; width: 40px; height: 40px; cursor: pointer; }
+        button { padding: 8px 15px; cursor: pointer; background: #444; color: white; border: 1px solid #666; border-radius: 4px; }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
 
-# Define English stop words set
-STOP_WORDS = {
-    'a', 'an', 'and', 'the', 'or', 'of', 'to', 'in', 'for', 'on', 'with',
-    'at', 'by', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him',
-    'her', 'us', 'them', 'my', 'your', 'his', 'its', 'our', 'their', 'this',
-    'that', 'these', 'those', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'shall', 'should',
-    'may', 'might', 'must', 'can', 'could', 'as', 'but', 'if', 'or', 'because',
-    'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between',
-    'into', 'through', 'during', 'before', 'after', 'above', 'below', 'from', 'up',
-    'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then',
-    'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both',
-    'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not',
-    'only', 'own', 'same', 'so', 'than', 'too', 'very'
-}
+    <div id="toolbar">
+        <input type="color" id="colorPicker" value="#000000">
+        <input type="range" id="lineWidth" min="1" max="50" value="5">
+        <span id="sizeDisplay">5px</span>
+        <button id="clearBtn">Clear Canvas</button>
+        <button id="eraserBtn">Eraser</button>
+    </div>
 
-def preprocess_text(text):
-    """Preprocess text: case conversion, punctuation removal, tokenization, stop word removal"""
-    # Convert to lowercase
-    text = text.lower()
+    <canvas id="paintCanvas"></canvas>
 
-    # Remove punctuation
-    translator = str.maketrans('', '', string.punctuation)
-    text = text.translate(translator)
+<script>
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+    const lineWidth = document.getElementById('lineWidth');
+    const sizeDisplay = document.getElementById('sizeDisplay');
+    const clearBtn = document.getElementById('clearBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
 
-    # Tokenization (simple space splitting; more complex logic can be used in practical applications)
-    tokens = text.split()
+    // Set canvas size
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - document.getElementById('toolbar').offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    # Remove stop words and empty strings
-    tokens = [token for token in tokens if token not in STOP_WORDS and token.strip() != '']
+    let painting = false;
+    let isEraser = false;
 
-    # Simple stemming (simplified version)
-    tokens = [stem_token(token) for token in tokens]
+    function startPosition(e) {
+        painting = true;
+        draw(e); // Allow single dots
+    }
 
-    return tokens
+    function finishedPosition() {
+        painting = false;
+        ctx.beginPath(); // Resets the path so lines don't connect weirdly
+    }
 
-def stem_token(token):
-    """Simple stemming function (more complex algorithms can be used in practical applications)"""
-    # Handle common suffixes
-    suffixes = ['ing', 'ly', 'ed', 'es', 's']
-    for suffix in suffixes:
-        if token.endswith(suffix) and len(token) > len(suffix):
-            return token[:-len(suffix)]
-    return token
+    function draw(e) {
+        if (!painting) return;
 
-# Test the preprocessing function
-sample_text = "Machine learning is a subset of artificial intelligence focused on developing algorithms that learn from data."
-processed_tokens = preprocess_text(sample_text)
-print("Preprocessed terms:", processed_tokens)
-SyntaxError: multiple statements found while compiling a single statement
-def calculate_tfidf(documents, inverted_index):
-    """Calculate TF-IDF values for each term in each document"""
-    num_docs = len(documents)
-    tfidf = {}  # Structure: {doc_id: {term: tfidf_value, ...}, ...}
+        ctx.lineWidth = lineWidth.value;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = isEraser ? '#FFFFFF' : colorPicker.value;
 
-    # Calculate total number of terms for each document
-    doc_lengths = []
-    for doc in documents:
-        tokens = preprocess_text(doc)
-        doc_lengths.append(len(tokens))
+        // Draw line to current mouse position
+        ctx.lineTo(e.clientX, e.clientY - canvas.offsetTop);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX, e.clientY - canvas.offsetTop);
+    }
 
-    # Calculate document frequency for each term (number of documents containing the term)
-    doc_freq = {term: len(entries) for term, entries in inverted_index.items()}
+    // Listeners
+    canvas.addEventListener('mousedown', startPosition);
+    canvas.addEventListener('mouseup', finishedPosition);
+    canvas.addEventListener('mousemove', draw);
 
-    # Calculate TF-IDF
-    for term, entries in inverted_index.items():
-        # Calculate IDF
-        idf = math.log(num_docs / (doc_freq[term] + 1))  # +1 to avoid division by zero
+    // Toolbar logic
+    lineWidth.addEventListener('input', () => sizeDisplay.innerText = lineWidth.value + 'px');
+    
+    clearBtn.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
 
-        for doc_id, positions in entries:
-            # Calculate TF
-            tf = len(positions) / doc_lengths[doc_id] if doc_lengths[doc_id] > 0 else 0
-
-            # Calculate TF-IDF
-            tfidf_value = tf * idf
-
-            # Store results
-            if doc_id not in tfidf:
-                tfidf[doc_id] = {}
-            tfidf[doc_id][term] = tfidf_value
-
-    return tfidf
-
-import math  # Import math library for logarithm calculation
-
-# Calculate TF-IDF values
-tfidf_scores = calculate_tfidf(documents, inverted_index)
-print("TF-IDF calculation completed")
-SyntaxError: invalid syntax
-def search(query, documents, inverted_index, tfidf_scores, top_n=3):
-    """Process query and return most relevant documents"""
-    # Preprocess query
-    query_terms = preprocess_text(query)
-    if not query_terms:
-        return []
-
-    # Get documents containing at least one query term
-    relevant_docs = set()
-    for term in query_terms:
-        if term in inverted_index:
-            for doc_id, _ in inverted_index[term]:
-                relevant_docs.add(doc_id)
-    relevant_docs = list(relevant_docs)
-
-    # Calculate relevance scores between query and each relevant document
-    scores = []
-    for doc_id in relevant_docs:
-        score = 0.0
-        for term in query_terms:
-            if term in tfidf_scores.get(doc_id, {}):
-                score += tfidf_scores[doc_id][term]
-
-        # Normalize score (divide by number of query terms)
-        score /= len(query_terms)
-        scores.append((doc_id, score))
-
-    # Sort by score
-    scores.sort(key=lambda x: x[1], reverse=True)
-
-    # Return top N results
-    results = []
-    for doc_id, score in scores[:top_n]:
-        if score > 0:
-            results.append({
-                'document': documents[doc_id],
-...                 'score': score,
-...                 'doc_id': doc_id
-...             })
-... 
-...     return results
-... 
-... # Test search functionality
-... import math  # Ensure math library is imported
-... query = "machine learning"
-... results = search(query, documents, inverted_index, tfidf_scores)
-... print(f"Query: {query}")
-... for i, result in enumerate(results, 1):
-...     print(f"\n Result {i} (Score: {result['score']:.4f}):")
-...     print(result['document'])
-...     
-SyntaxError: invalid syntax
->>> def load_inverted_index_from_csv(filename):
-...     """Load inverted index from CSV file"""
-...     inverted_index = defaultdict(list)
-... 
-...     with open(filename, 'r', encoding='utf-8') as f:
-...         reader = csv.reader(f)
-...         next(reader)  # Skip header
-... 
-...         for row in reader:
-...             term = row[0]
-...             doc_id = int(row[1])
-... 
-...             # Convert position string back to list
-...             positions = eval(row[2])  # Note: eval has security risks; use safer methods in practical applications
-... 
-...             inverted_index[term].append((doc_id, positions))
-... 
-...     return inverted_index
-... 
-... # Test loading inverted index
-... loaded_index = load_inverted_index_from_csv('inverted_index.csv')
+    eraserBtn.addEventListener('click', () => {
+        isEraser = !isEraser;
+        eraserBtn.style.background = isEraser ? '#cc0000' : '#444';
+        eraserBtn.innerText = isEraser ? 'Brush' : 'Eraser';
+    });
+</script>
+</body>
+</html>
 ... print(f"Inverted index loaded from CSV contains {len(loaded_index)} terms")
