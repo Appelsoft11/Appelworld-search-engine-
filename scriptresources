@@ -7,7 +7,7 @@ Created by: Appelsoft
     <title>JS Paint Pro</title>
     <style>
         body { margin: 0; background: #333; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        #toolbar { background: #222; padding: 10px; display: flex; gap: 15px; align-items: center; color: white; }
+        #toolbar { background: #999; padding: 10px; display: flex; gap: 15px; align-items: center; color: white; }
         canvas { background: white; cursor: crosshair; flex-grow: 1; }
         input[type="color"] { border: none; width: 40px; height: 40px; cursor: pointer; }
         button { padding: 8px 15px; cursor: pointer; background: #444; color: white; border: 1px solid #666; border-radius: 4px; }
